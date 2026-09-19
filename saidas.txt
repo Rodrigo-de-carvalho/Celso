@@ -1,0 +1,431 @@
+Registro das saídas - Q01 a Q30 (TypeScript, Professor Celso Barreto)
+
+----------------------------------------------------------------------
+Q01 - Tarifa de energia
+
+Teste Consumo 0: Faixa 1 (Até 100 kWh)
+Teste Consumo 100: Faixa 1 (Até 100 kWh)
+Teste Consumo 101: Faixa 2 (101 a 220 kWh)
+Teste Consumo 220: Faixa 2 (101 a 220 kWh)
+Teste Consumo 221: Faixa 3 (Acima de 220 kWh)
+
+Conferência: 0 e 100 ficam na faixa 1, 101 e 220 na faixa 2 e 221 na faixa 3. Os limites 100 e 220 entram na faixa de baixo, e o valor negativo é rejeitado antes de qualquer faixa.
+
+----------------------------------------------------------------------
+Q02 - Elegibilidade para benefício
+
+Cenário 1: Elegível com prioridade (possui pessoa idosa).
+Cenário 2: Elegível.
+Cenário 3: Elegível.
+Cenário 4: Não elegível: renda por pessoa acima de R$ 706,00.
+Cenário 5: Não elegível: cadastro inativo.
+
+Conferência: O cenário 1 (com idoso) tem prioridade e o 2 (sem idoso) é só elegível. O 706 exato é elegível, porque a regra diz que a renda não pode ultrapassar esse valor. Renda acima (cenário 4) ou cadastro inativo (cenário 5) não é elegível mesmo com idoso, já que o idoso só dá prioridade depois dos dois critérios básicos.
+
+----------------------------------------------------------------------
+Q03 - Alerta de temperatura
+
+Temperatura -21: Leitura inválida
+Temperatura -20: Normal
+Temperatura 29: Normal
+Temperatura 30: Atenção
+Temperatura 39: Atenção
+Temperatura 40: Crítico
+Temperatura 100: Crítico
+Temperatura 101: Leitura inválida
+
+Conferência: Confere com a regra e com o teste de mesa abaixo. A validação é o primeiro if, então uma leitura inválida nunca vira Normal, Atenção ou Crítico. -20 e 100 são válidos. Valores entre as faixas (29,5, por exemplo) ficam em Normal, porque uso >= 30.
+
+Teste de mesa (inválida = menor que -20 ou maior que 100):
+
+Entrada | Inválida? | >= 40? | >= 30? | Saída
+-21     | sim       | -      | -      | Leitura inválida
+-20     | não       | não    | não    | Normal
+29      | não       | não    | não    | Normal
+30      | não       | não    | sim    | Atenção
+39      | não       | não    | sim    | Atenção
+40      | não       | sim    | -      | Crítico
+100     | não       | sim    | -      | Crítico
+101     | sim       | -      | -      | Leitura inválida
+
+----------------------------------------------------------------------
+Q04 - Controle de acesso
+
+Execução 1 (aluno): Acesso liberado: área do aluno (notas e materiais).
+Execução 2 (professor): Acesso liberado: área do professor (diário de classe).
+Execução 3 (coordenador): Acesso liberado: área do coordenador (gestão dos cursos).
+Execução 4 (entrada inválida): Perfil desconhecido: acesso negado.
+
+Conferência: Cada perfil abriu a sua área. O perfil desconhecido (visitante, simulado) teve o acesso negado pelo default do switch, sem nenhuma permissão.
+
+----------------------------------------------------------------------
+Q05 - Desconto progressivo
+
+Compra de R$ 100 | institucional: false | desconto: 0% | valor final: R$ 100.00
+Compra de R$ 100.01 | institucional: false | desconto: 5% | valor final: R$ 95.01
+Compra de R$ 300 | institucional: false | desconto: 5% | valor final: R$ 285.00
+Compra de R$ 300.01 | institucional: false | desconto: 10% | valor final: R$ 270.01
+Compra de R$ 600 | institucional: false | desconto: 10% | valor final: R$ 540.00
+Compra de R$ 600.01 | institucional: false | desconto: 15% | valor final: R$ 510.01
+Compra de R$ 50 | institucional: true | desconto: 3% | valor final: R$ 48.50
+Compra de R$ 200 | institucional: true | desconto: 8% | valor final: R$ 184.00
+Compra de R$ 700 | institucional: true | desconto: 18% | valor final: R$ 574.00
+
+Conferência: 100, 300 e 600 exatos ficam na faixa de baixo (0%, 5% e 10%), e 100,01, 300,01 e 600,01 sobem de faixa, porque a regra diz "acima de". Institucional soma 3 pontos (R$ 50 fica com 3% e R$ 200 com 8%) e R$ 700 chega a 18%, o teto. Considerei que os 3 pontos valem mesmo sem desconto de faixa.
+
+----------------------------------------------------------------------
+Q06 - Validação de triângulo
+
+Medidas 3, 3, 3: Triângulo equilátero
+Medidas 5, 5, 8: Triângulo isósceles
+Medidas 8, 5, 5: Triângulo isósceles
+Medidas 3, 4, 5: Triângulo escaleno
+Medidas 1, 2, 3: Não forma triângulo: viola a desigualdade triangular.
+Medidas 1, 2, 10: Não forma triângulo: viola a desigualdade triangular.
+Medidas 0, 4, 5: Não forma triângulo: as medidas devem ser positivas.
+Medidas -3, 4, 5: Não forma triângulo: as medidas devem ser positivas.
+
+Conferência: 3,3,3 é equilátero, 5,5,8 e 8,5,5 são isósceles e 3,4,5 é escaleno. 1,2,3 e 1,2,10 não formam triângulo (no 1,2,3 a soma dos dois menores é igual ao terceiro lado), e 0 e -3 são rejeitados. A validação vem antes da classificação.
+
+----------------------------------------------------------------------
+Q07 - Ano bissexto
+
+Ano 1900: não bissexto
+Ano 2000: bissexto
+Ano 2024: bissexto
+Ano 2100: não bissexto
+
+Conferência: 1900 e 2100 não são bissextos, 2000 e 2024 são. O agrupamento dos operadores está explicado no comentário do Q07.ts.
+
+----------------------------------------------------------------------
+Q08 - Frete por região
+
+Região N | pedido R$ 300 | frete R$ 45
+Região N | pedido R$ 500 | frete R$ 45
+Região N | pedido R$ 500.01 | frete R$ 45
+Região N | pedido R$ 800 | frete R$ 45
+Região NE | pedido R$ 300 | frete R$ 38
+Região NE | pedido R$ 500 | frete R$ 38
+Região NE | pedido R$ 500.01 | frete R$ 0
+Região NE | pedido R$ 800 | frete R$ 0
+Região CO | pedido R$ 300 | frete R$ 32
+Região CO | pedido R$ 500 | frete R$ 32
+Região CO | pedido R$ 500.01 | frete R$ 32
+Região CO | pedido R$ 800 | frete R$ 32
+Região SE | pedido R$ 300 | frete R$ 20
+Região SE | pedido R$ 500 | frete R$ 20
+Região SE | pedido R$ 500.01 | frete R$ 0
+Região SE | pedido R$ 800 | frete R$ 0
+Região S | pedido R$ 300 | frete R$ 28
+Região S | pedido R$ 500 | frete R$ 28
+Região S | pedido R$ 500.01 | frete R$ 28
+Região S | pedido R$ 800 | frete R$ 28
+
+Conferência: O frete grátis só aparece em NE e SE com pedido acima de 500 (500,01 e 800). Com exatamente 500 ainda paga frete, e N, CO e S sempre pagam. Os valores de frete por região são inventados (N 45, NE 38, CO 32, SE 20 e S 28), porque o enunciado não informa.
+
+----------------------------------------------------------------------
+Q09 - Média acadêmica
+
+Notas 7, 7, 7: Média 7.00: Aprovado
+Notas 6, 7, 7: Média 6.67: Recuperação
+Notas 5, 5, 5: Média 5.00: Recuperação
+Notas 4, 5, 5: Média 4.67: Reprovado
+Notas 10, 10, 10: Média 10.00: Aprovado
+Notas 0, 0, 0: Média 0.00: Reprovado
+Notas 11, 5, 5: Cálculo inválido: todas as notas devem estar entre 0 e 10.
+Notas -1, 8, 8: Cálculo inválido: todas as notas devem estar entre 0 e 10.
+
+Conferência: 7,7,7 dá 7,00 e aprova, 5,5,5 dá 5,00 e vai para recuperação, 6,7,7 dá 6,67 (recuperação) e 4,5,5 dá 4,67 (reprova). 0 e 10 são notas válidas, e 11 e -1 invalidam o cálculo, que só acontece depois de validar as três notas.
+
+----------------------------------------------------------------------
+Q10 - Semáforo inteligente
+
+Vermelho, com pedestre: Veículos param. Pedestres podem atravessar.
+Vermelho, sem pedestre: Veículos param.
+Amarelo, com pedestre: Preparar parada: há pedestres aguardando.
+Amarelo, sem pedestre: Preparar parada.
+Verde, com pedestre: Veículos passam. Pedestres aguardam.
+Verde, sem pedestre: Veículos passam. Nenhum pedestre aguardando.
+Verde, sensor inconsistente: Modo de segurança: sensor inconsistente.
+Vermelho, sensor inconsistente: Modo de segurança: sensor inconsistente.
+
+Conferência: Cada cor gera a mensagem esperada, com e sem pedestre. O sensor inconsistente é verificado antes do switch, então o modo de segurança vale para qualquer cor.
+
+----------------------------------------------------------------------
+Q11 - Soma de consumo
+
+Total da semana: 274 kWh
+Média diária: 39.14 kWh
+Dias acima da média: 3
+
+Conferência: Na mão: 42 + 38 + 45 + 50 + 36 + 30 + 33 = 274 e 274 / 7 = 39,14. Acima da média só 42, 45 e 50, ou seja, 3 dias.
+
+----------------------------------------------------------------------
+Q12 - Contagem regressiva
+
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+0
+Experimento iniciado!
+
+Conferência: Aparece de 10 até 0, com o zero uma única vez, e a mensagem só depois do laço.
+
+----------------------------------------------------------------------
+Q13 - Tabuada parametrizada
+
+Tabuada do 7:
+7 x 1 = 7
+7 x 2 = 14
+7 x 3 = 21
+7 x 4 = 28
+7 x 5 = 35
+7 x 6 = 42
+7 x 7 = 49
+7 x 8 = 56
+7 x 9 = 63
+7 x 10 = 70
+Valor 101 inválido: informe um inteiro entre 1 e 100.
+Valor 3.5 inválido: informe um inteiro entre 1 e 100.
+
+Conferência: O 7 gerou as 10 linhas certas. 101 e 3,5 foram recusados, porque o valor precisa ser inteiro entre 1 e 100, e essa validação acontece antes do laço.
+
+----------------------------------------------------------------------
+Q14 - Tentativas de login
+
+Teste 1 (acerta na 2ª): Acesso liberado na tentativa 2.
+Teste 2 (acerta na 3ª): Acesso liberado na tentativa 3.
+Teste 3 (bloqueio): Conta bloqueada: 3 tentativas esgotadas.
+
+Conferência: Acertando na 2ª ou na 3ª tentativa o laço para na hora. Com três erros a conta é bloqueada, mesmo com a 4ª tentativa da lista correta. A senha é só um valor de teste.
+
+----------------------------------------------------------------------
+Q15 - Menu obrigatório
+
+MENU: 1 - Cadastrar | 2 - Consultar | 3 - Sair
+Opção digitada: 5
+Opção inválida! O menu será exibido novamente.
+MENU: 1 - Cadastrar | 2 - Consultar | 3 - Sair
+Opção digitada: 1
+Cadastrando...
+MENU: 1 - Cadastrar | 2 - Consultar | 3 - Sair
+Opção digitada: 2
+Consultando...
+MENU: 1 - Cadastrar | 2 - Consultar | 3 - Sair
+Opção digitada: 9
+Opção inválida! O menu será exibido novamente.
+MENU: 1 - Cadastrar | 2 - Consultar | 3 - Sair
+Opção digitada: 3
+Saindo do programa.
+
+Conferência: O menu apareceu 5 vezes: as opções 5 e 9 são inválidas e repetiram o menu, e a 3 encerrou. Como é um do...while, o menu aparece pelo menos uma vez.
+
+----------------------------------------------------------------------
+Q16 - Filtragem de sensores
+
+Leituras válidas: [ 22, 24 ]
+Média: 23
+
+Conferência: O -5 foi ignorado, o 999 encerrou a leitura e o 25 nem foi lido. Sobraram 22 e 24, com média 23 (confere: 46 / 2).
+
+----------------------------------------------------------------------
+Q17 - Busca de matrícula
+
+Matrícula 2024002: Bruno (2 iterações)
+Matrícula 2024099: não encontrada (5 iterações)
+
+Conferência: A matrícula 2024002 foi encontrada na 2ª iteração e o laço parou. A 2024099 não existe e passou pelas 5. Ou seja, achando a busca termina antes, e não achando percorre a lista toda.
+
+----------------------------------------------------------------------
+Q18 - Controle de estoque
+
+Caneta - zerado
+Caderno - abaixo de 5 unidades
+Lápis - regular
+Borracha - zerado
+Régua - regular
+Zerados: 2
+Abaixo de 5 unidades: 1
+Regulares: 2
+
+Conferência: Caneta e Borracha zeradas (2), Caderno com 3 abaixo de 5 (1), Lápis com 5 e Régua com 12 regulares (2). Exatamente 5 unidades conta como regular, porque a regra é "abaixo de 5".
+
+----------------------------------------------------------------------
+Q19 - Números pares e ímpares
+
+Pares: 25
+Ímpares: 25
+Múltiplos de 5: 10
+
+Conferência: De 1 a 50 são 25 pares, 25 ímpares e 10 múltiplos de 5, como esperado. Os contadores são independentes (o 10, por exemplo, conta como par e também como múltiplo de 5).
+
+----------------------------------------------------------------------
+Q20 - Sequência de Fibonacci
+
+n = 2: 0 1
+n = 8: 0 1 1 2 3 5 8 13
+n = 30: 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229
+n = 1: n inválido: informe um valor de 2 a 30.
+n = 31: n inválido: informe um valor de 2 a 30.
+
+Conferência: n = 2 dá 0 1 e n = 8 dá 0 1 1 2 3 5 8 13. Com n = 30 o último termo é 514229. 1 e 31 foram recusados, porque o n aceito vai de 2 a 30.
+
+----------------------------------------------------------------------
+Q21 - Número primo
+
+2: primo
+3: primo
+17: primo
+97: primo
+4: composto (divisível por 2)
+9: composto (divisível por 3)
+25: composto (divisível por 5)
+91: composto (divisível por 7)
+1: inválido (precisa ser maior que 1)
+
+Conferência: 2, 3, 17 e 97 são primos, 4, 9, 25 e 91 são compostos e o 1 é recusado. O laço vai até a raiz quadrada usando <=, senão 9 e 25 seriam tratados como primos, e para assim que acha um divisor.
+
+----------------------------------------------------------------------
+Q22 - Fatorial seguro
+
+0! = 1
+5! = 120
+15! = 1307674368000
+Erro: não existe fatorial de número negativo (-3).
+Erro: 2.5 não é um número inteiro.
+Erro: 16 está acima do limite de 15.
+
+Conferência: 0! = 1, 5! = 120 e 15! = 1307674368000. -3, 2,5 e 16 geram mensagem de erro (negativo, fracionário e acima do limite). O 0! dá 1 porque o laço nem chega a executar.
+
+----------------------------------------------------------------------
+Q23 - Matriz de notas
+
+Turma 1 - média: 7.50
+Turma 2 - média: 5.50
+Turma 3 - média: 9.00
+Maior nota geral: 10
+
+Conferência: Na mão: (7+8+6+9)/4 = 7,5, (5+6+7+4)/4 = 5,5 e (9+9+10+8)/4 = 9. A maior nota é 10. A soma volta a zero a cada turma, então cada média usa só as notas da sua turma.
+
+----------------------------------------------------------------------
+Q24 - Mapa de assentos
+
+A1    A2(R) A3    A4    A5    A6
+B1    B2    B3    B4    B5(R) B6
+C1(R) C2(R) C3    C4    C5    C6
+D1    D2    D3    D4    D5    D6
+E1    E2    E3    E4    E5    E6(R)
+(R) = reservado
+
+Conferência: Mapa com 5 filas de 6 assentos, de A1 a E6, e os reservados da lista (A2, B5, C1, C2 e E6) marcados com (R).
+
+----------------------------------------------------------------------
+Q25 - Economia de energia
+
+Residência 1: redução de 15.0% - meta atingida
+Residência 2: redução de 6.7% - meta não atingida
+Residência 3: redução de 10.0% - meta atingida
+Residência 4: redução de -8.3% - meta não atingida
+Residência 5: não dá para calcular (consumo anterior igual a zero)
+Residência 6: redução de 20.0% - meta atingida
+Residência 7: redução de 8.3% - meta não atingida
+Residência 8: redução de 11.1% - meta atingida
+Residência 9: redução de 10.0% - meta atingida
+Residência 10: não dá para calcular (consumo anterior igual a zero)
+Residência 11: redução de 0.0% - meta não atingida
+Residência 12: redução de 16.0% - meta atingida
+Residências que atingiram a meta: 6 de 12
+
+Conferência: 6 das 12 residências atingiram a meta (1, 3, 6, 8, 9 e 12). A 3 e a 9 reduziram exatamente 10% e contam, porque a meta é no mínimo 10%. A 5 e a 10 tinham consumo anterior zero e não foram calculadas, para evitar a divisão por zero. A 4 aumentou o consumo, por isso mostra redução negativa.
+
+----------------------------------------------------------------------
+Q26 - Caixa eletrônico
+
+Saque de 186: 1 x R$ 100, 1 x R$ 50, 1 x R$ 20, 1 x R$ 10, 3 x R$ 2
+Saque de 13: 1 x R$ 5, 4 x R$ 2
+Saque de 3: Valor impossível de pagar com as cédulas disponíveis.
+Saque de 12.5: Valor inválido: informe um inteiro positivo, sem centavos.
+Saque de -20: Valor inválido: informe um inteiro positivo, sem centavos.
+
+Conferência: 186 = 100 + 50 + 20 + 10 + 3x2 e 13 = 5 + 4x2, os dois conferem. O 3 é impossível, e 12,5 e -20 são inválidos. Com notas de 2 e 5 só o 1 e o 3 são impossíveis, e o código evita deixar sobrar 1 ou 3, por isso o 13 é aceito.
+
+----------------------------------------------------------------------
+Q27 - Pesquisa de satisfação
+
+PESQUISA 1
+Respostas válidas: 9 | inválidas: 3
+Média das respostas válidas: 7.22
+Nota 0: 1
+Nota 1: 0
+Nota 2: 0
+Nota 3: 0
+Nota 4: 0
+Nota 5: 1
+Nota 6: 0
+Nota 7: 1
+Nota 8: 3
+Nota 9: 1
+Nota 10: 2
+PESQUISA 2
+Respostas válidas: 0 | inválidas: 3
+Nenhuma resposta válida, não dá para calcular a média.
+
+Conferência: Pesquisa 1: 3 respostas inválidas (11, -1 e 15) e 9 válidas, soma 65 e média 65 / 9 = 7,22. A pesquisa 2 não tem resposta válida e por isso não calcula a média, para não dividir por zero. 0 e 10 são respostas válidas.
+
+----------------------------------------------------------------------
+Q28 - Detecção de sequência
+
+Teste 1: Sequência do código 3 encontrada a partir do índice 3.
+Teste 2: Sequência do código 9 encontrada a partir do índice 1.
+Teste 3: Nenhuma sequência de três códigos iguais encontrada.
+Teste 4: Nenhuma sequência de três códigos iguais encontrada.
+
+Conferência: No 1º teste a primeira sequência é a do 3, no índice 3 (a do 8 vem depois e é ignorada). No 2º é o 9 no índice 1. O 3º e o 4º não têm sequência. O laço para 2 posições antes do fim para não passar do array, e termina na primeira ocorrência.
+
+----------------------------------------------------------------------
+Q29 - Simulação de pagamento
+
+Dívida de R$ 1000 | pagamento mensal de R$ 300
+Mês 1 | juros: R$ 10.00 | pago: R$ 300.00 | saldo: R$ 710.00
+Mês 2 | juros: R$ 7.10 | pago: R$ 300.00 | saldo: R$ 417.10
+Mês 3 | juros: R$ 4.17 | pago: R$ 300.00 | saldo: R$ 121.27
+Dívida quitada em 4 meses.
+
+Dívida de R$ 10000 | pagamento mensal de R$ 101
+Mês 1 | juros: R$ 100.00 | pago: R$ 101.00 | saldo: R$ 9999.00
+Mês 2 | juros: R$ 99.99 | pago: R$ 101.00 | saldo: R$ 9997.99
+Mês 3 | juros: R$ 99.98 | pago: R$ 101.00 | saldo: R$ 9996.97
+Limite de 120 meses atingido. Saldo restante: R$ 9770.01
+
+Dívida de R$ 10000 | pagamento mensal de R$ 100
+Pagamento insuficiente: não cobre nem os juros do primeiro mês.
+
+Conferência: 1000 pagando 300 quita em 4 meses (mês 1: juros 10,00 e saldo 710,00, confere na mão). 10000 pagando 101 chega ao limite de 120 meses com saldo de 9770,01. 10000 pagando 100 é recusado, porque os juros do 1º mês já são 100 e o saldo nunca diminuiria. Os valores são arredondados para 2 casas e o relatório mostra só os 3 primeiros meses e o resumo.
+
+----------------------------------------------------------------------
+Q30 - Projeto integrador
+
+TESTE DAS REGRAS
+Leitura 0 válida? true
+Leitura -1 válida? false
+Média 20: Baixo
+Média 20.01: Moderado
+Média 40: Moderado
+Média 40.01: Alto
+
+RELATÓRIO DE CONSUMO POR SALA
+Sala 101 (manhã) | total: 104 kWh | média: 20.80 kWh/dia | válidas: 5 | inválidas: 0 | Moderado
+Sala 102 (tarde) | total: 158 kWh | média: 39.50 kWh/dia | válidas: 4 | inválidas: 1 | Moderado
+Laboratório (manhã) | total: 306 kWh | média: 61.20 kWh/dia | válidas: 5 | inválidas: 0 | Alto
+Biblioteca (noite) | total: 57 kWh | média: 11.40 kWh/dia | válidas: 5 | inválidas: 0 | Baixo
+Sala 201 (noite) | total: 0 kWh | média: 0.00 kWh/dia | válidas: 0 | inválidas: 3 | Sem leituras válidas
+Sala de maior consumo: Laboratório - 306 kWh
+
+Conferência: Sala 101 (104 kWh) e Sala 102 (158 kWh, com uma leitura inválida, o -3) são Moderado, o Laboratório (306 kWh) é Alto, a Biblioteca (57 kWh) é Baixo e a Sala 201 não tem leitura válida. A de maior consumo é o Laboratório. Leitura negativa é inválida e não entra na conta. As faixas (até 20 baixo, até 40 moderado, acima disso alto) são inventadas, porque o enunciado não define.
